@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Blood — LifeGive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --red: #C0392B;
+            --red-dark: #922B21;
+            --red-light: #FADBD8;
+            --red-glow: #E74C3C;
+            --bg: #FAFAF8;
+            --surface: #FFFFFF;
+            --text: #1A1A1A;
+            --muted: #6B6B6B;
+            --border: #E8E2DA;
+            --accent: #F5EDE8;
+            --green: #1E7E3A;
+            --green-light: #D4EDDA;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ── */
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 68px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--red);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.3px;
+        }
+
+        .logo-text span { color: var(--red); }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        nav a {
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--muted);
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        nav a:hover { color: var(--text); background: var(--accent); }
+        nav a.active { color: var(--red); background: var(--red-light); }
+
+        nav .btn-donate {
+            background: var(--red);
+            color: white !important;
+            border-radius: 8px;
+        }
+
+        nav .btn-donate:hover {
+            background: var(--red-dark) !important;
+            color: white !important;
+        }
+
+        /* ── PAGE HEADER BANNER ── */
+        .page-banner {
+            background: linear-gradient(135deg, #1A0A0A 0%, #2D0F0F 100%);
+            padding: 52px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(192,57,43,0.2) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .page-banner .badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--red-glow);
+            border: 1px solid rgba(231,76,60,0.35);
+            background: rgba(231,76,60,0.08);
+            padding: 5px 14px;
+            border-radius: 99px;
+            margin-bottom: 16px;
+        }
+
+        .page-banner h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(28px, 4vw, 44px);
+            font-weight: 700;
+            color: white;
+            letter-spacing: -0.8px;
+            line-height: 1.2;
+        }
+
+        .page-banner h1 em {
+            font-style: italic;
+            color: var(--red-glow);
+        }
+
+        .page-banner p {
+            font-size: 15px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 10px;
+        }
+
+        /* ── MAIN LAYOUT ── */
+        .page-body {
+            max-width: 1100px;
+            margin: 56px auto;
+            padding: 0 40px;
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 48px;
+            align-items: start;
+        }
+
+        /* ── FORM CARD ── */
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            position: sticky;
+            top: 88px;
+        }
+
+        .form-card-header {
+            margin-bottom: 24px;
+        }
+
+        .form-card-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 21px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .form-card-header p {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .urgency-banner {
+            background: #FEF9E7;
+            border: 1px solid #F9E79F;
+            border-radius: 10px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #7D6608;
+            margin-bottom: 24px;
+        }
+
+        .urgency-dot {
+            width: 8px;
+            height: 8px;
+            background: #F1C40F;
+            border-radius: 50%;
+            flex-shrink: 0;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.2); }
+        }
+
+        .form-divider {
+            height: 1px;
+            background: var(--border);
+            margin-bottom: 22px;
+        }
+
+        .form-group { margin-bottom: 16px; }
+
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--muted);
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        input[type="text"],
+        input[type="tel"],
+        select {
+            width: 100%;
+            padding: 11px 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            color: var(--text);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            outline: none;
+            transition: border 0.2s, box-shadow 0.2s;
+            appearance: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--red);
+            box-shadow: 0 0 0 3px rgba(192,57,43,0.1);
+            background: white;
+        }
+
+        input::placeholder { color: #C0C0C0; }
+
+        .select-wrap { position: relative; }
+        .select-wrap::after {
+            content: '';
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0; height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid var(--muted);
+            pointer-events: none;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--red);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 6px;
+            transition: background 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .submit-btn:hover { background: var(--red-dark); }
+        .submit-btn:active { transform: scale(0.99); }
+
+        .form-note {
+            text-align: center;
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+
+        /* ── DONORS SECTION ── */
+        .donors-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+
+        .donors-section > p {
+            font-size: 14px;
+            color: var(--muted);
+            margin-bottom: 24px;
+        }
+
+        /* filter pills */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .filter-pill {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 99px;
+            border: 1.5px solid var(--border);
+            background: var(--surface);
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .filter-pill:hover, .filter-pill.active {
+            border-color: var(--red);
+            background: var(--red-light);
+            color: var(--red);
+        }
+
+        /* donor cards */
+        .donor-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .donor-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .donor-card:hover {
+            border-color: #D5C8BF;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+        }
+
+        .donor-avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: var(--red-light);
+            color: var(--red);
+            font-weight: 700;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .donor-info {
+            flex: 1;
+        }
+
+        .donor-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 3px;
+        }
+
+        .donor-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .donor-city {
+            font-size: 13px;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .donor-city svg {
+            width: 12px;
+            height: 12px;
+            stroke: var(--muted);
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .blood-badge {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 6px;
+            background: var(--red-light);
+            color: var(--red);
+            flex-shrink: 0;
+        }
+
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--red);
+            background: var(--red-light);
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.15s;
+            white-space: nowrap;
+        }
+
+        .contact-btn:hover {
+            background: #F1A9A0;
+        }
+
+        .contact-btn svg {
+            width: 14px;
+            height: 14px;
+            stroke: var(--red);
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .available-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--green);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .donors-empty {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--muted);
+            font-size: 14px;
+            background: var(--surface);
+            border: 1px dashed var(--border);
+            border-radius: 14px;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: #1A0A0A;
+            color: rgba(255,255,255,0.45);
+            text-align: center;
+            padding: 28px 20px;
+            font-size: 13px;
+            margin-top: 60px;
+        }
+
+        footer strong {
+            color: rgba(255,255,255,0.75);
+            font-weight: 500;
+        }
+
+        @media (max-width: 860px) {
+            .page-body {
+                grid-template-columns: 1fr;
+                padding: 0 20px;
+                margin: 40px auto;
+                gap: 40px;
+            }
+            .form-card { position: static; }
+            .form-row { grid-template-columns: 1fr; }
+            header { padding: 0 20px; }
+            .page-banner { padding: 48px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="{% url 'home' %}" class="logo">
+        <div class="logo-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6 8 4 12 4 15a8 8 0 0016 0c0-3-2-7-8-13z"/>
+            </svg>
+        </div>
+        <span class="logo-text">Life<span>Give</span></span>
+    </a>
+    <nav>
+        <a href="{% url 'home' %}">Donate</a>
+        <a href="{% url 'request' %}" class="active btn-donate">Request Blood</a>
+    </nav>
+</header>
+
+<div class="page-banner">
+    <div class="badge">🚨 Urgent Blood Request</div>
+    <h1>Need Blood <em>Right Now?</em></h1>
+    <p>Submit a request and we'll match you with verified donors in your city instantly.</p>
+</div>
+
+<div class="page-body">
+
+    <!-- REQUEST FORM -->
+    <div class="form-card">
+        <div class="form-card-header">
+            <h3>Submit Blood Request</h3>
+            <p>We'll notify matching donors in your area immediately</p>
+        </div>
+
+        <div class="urgency-banner">
+            <div class="urgency-dot"></div>
+            <span>Donors are checked and alerted within minutes of your request</span>
+        </div>
+
+        <div class="form-divider"></div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="patient_name">Patient Name</label>
+                <input type="text" id="patient_name" name="patient_name" placeholder="e.g. Karthik Rajan" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="blood_group">Blood Group Needed</label>
+                    <div class="select-wrap">
+                        <select id="blood_group" name="blood_group" required>
+                            <option value="" disabled selected>Select group</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A−</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B−</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O−</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB−</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Contact Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="+91 98765 43210" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="hospital_name">Hospital Name &amp; City</label>
+                <input type="text" id="hospital_name" name="hospital_name" placeholder="e.g. Govt. Rajaji Hospital, Madurai" required>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <svg viewBox="0 0 16 16" style="width:16px;height:16px;stroke:white;fill:none;stroke-width:2.5;">
+                    <path d="M2 8h12M9 4l5 4-5 4"/>
+                </svg>
+                Submit Emergency Request
+            </button>
+        </form>
+
+        <p class="form-note">🔒 Patient details are kept confidential and only shared with matched donors.</p>
+    </div>
+
+    <!-- DONORS LIST -->
+    <div class="donors-section">
+        <h2>Available Donors</h2>
+        <p>Verified donors ready to help in your area. Filter by blood group to find your match.</p>
+
+        <div class="filter-bar">
+            <button class="filter-pill active" onclick="filterDonors('all', this)">All</button>
+            <button class="filter-pill" onclick="filterDonors('O+', this)">O+</button>
+            <button class="filter-pill" onclick="filterDonors('A+', this)">A+</button>
+            <button class="filter-pill" onclick="filterDonors('B+', this)">B+</button>
+            <button class="filter-pill" onclick="filterDonors('AB+', this)">AB+</button>
+            <button class="filter-pill" onclick="filterDonors('O-', this)">O−</button>
+        </div>
+
+        <div class="donor-list" id="donorList">
+
+            {% for donor in donors %}
+            <div class="donor-card" data-group="{{ donor.blood_group }}">
+                <div class="donor-avatar">{{ donor.name|slice:":2"|upper }}</div>
+                <div class="donor-info">
+                    <div class="donor-name">{{ donor.name }}</div>
+                    <div class="donor-meta">
+                        <span class="donor-city">
+                            <svg viewBox="0 0 12 12"><path d="M6 1a3.5 3.5 0 010 7C4 8 2 10 2 11h8c0-1-2-3-4-3a3.5 3.5 0 010-7z"/></svg>
+                            {{ donor.city }}
+                        </span>
+                        <div class="available-dot"></div>
+                        <span style="font-size:12px;color:var(--green);font-weight:500;">Available</span>
+                    </div>
+                </div>
+                <div class="blood-badge">{{ donor.blood_group }}</div>
+                <a href="tel:{{ donor.phone }}" class="contact-btn">
+                    <svg viewBox="0 0 14 14"><path d="M2 2h3l1 3-2 1a9 9 0 004 4l1-2 3 1v3a1 1 0 01-1 1A11 11 0 011 3a1 1 0 011-1z"/></svg>
+                    Call
+                </a>
+            </div>
+            {% empty %}
+            <div class="donors-empty">
+                <p style="font-size:32px;margin-bottom:12px;">🩸</p>
+                <p style="font-weight:600;color:var(--text);margin-bottom:6px;">No donors registered yet</p>
+                <p>Be the first to <a href="{% url 'home' %}" style="color:var(--red);text-decoration:none;font-weight:500;">register as a donor</a> in your area.</p>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+
+</div>
+
+<footer>
+    <strong>LifeGive</strong> — Blood Donation Network &nbsp;·&nbsp; Making Tamil Nadu healthier, one drop at a time.
+</footer>
+
+<script>
+    function filterDonors(group, btn) {
+        document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.donor-card').forEach(card => {
+            card.style.display = (group === 'all' || card.dataset.group === group) ? 'flex' : 'none';
+        });
+    }
+</script>
+
+</body>
+</html>

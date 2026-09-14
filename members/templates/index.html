@@ -1,0 +1,853 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeGive — Blood Donation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --red: #C0392B;
+            --red-dark: #922B21;
+            --red-light: #FADBD8;
+            --red-glow: #E74C3C;
+            --bg: #FAFAF8;
+            --surface: #FFFFFF;
+            --text: #1A1A1A;
+            --muted: #6B6B6B;
+            --border: #E8E2DA;
+            --accent: #F5EDE8;
+            --green: #1E7E3A;
+            --green-light: #D4EDDA;
+            --star: #F1C40F;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .messages { max-width: 1100px; margin: 20px auto 0; padding: 0 40px; }
+        .msg {
+            padding: 12px 16px; border-radius: 10px; font-size: 13px; margin-bottom: 10px;
+        }
+        .msg.success { background: var(--green-light); color: var(--green); }
+        .msg.error { background: var(--red-light); color: var(--red); }
+
+        /* ── HEADER ── */
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 68px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--red);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.3px;
+        }
+
+        .logo-text span {
+            color: var(--red);
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        nav a, nav button.nav-btn {
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--muted);
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: none;
+            background: none;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+        }
+
+        nav a:hover, nav button.nav-btn:hover {
+            color: var(--text);
+            background: var(--accent);
+        }
+
+        nav a.active {
+            color: var(--red);
+            background: var(--red-light);
+        }
+
+        nav .btn-request {
+            background: var(--red);
+            color: white !important;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        nav .btn-request:hover {
+            background: var(--red-dark) !important;
+            color: white !important;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            background: linear-gradient(135deg, #1A0A0A 0%, #2D0F0F 50%, #1A0A0A 100%);
+            padding: 80px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(192,57,43,0.25) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--red-glow);
+            border: 1px solid rgba(231,76,60,0.35);
+            background: rgba(231,76,60,0.08);
+            padding: 6px 16px;
+            border-radius: 99px;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(36px, 5vw, 58px);
+            font-weight: 700;
+            color: white;
+            line-height: 1.15;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+
+        .hero h1 em {
+            font-style: italic;
+            color: var(--red-glow);
+        }
+
+        .hero p {
+            font-size: 17px;
+            color: rgba(255,255,255,0.55);
+            max-width: 480px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            margin-top: 48px;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        /* ── MAIN LAYOUT ── */
+        .page-body {
+            max-width: 1100px;
+            margin: 60px auto;
+            padding: 0 40px;
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 60px;
+            align-items: start;
+        }
+
+        /* ── LEFT INFO PANEL ── */
+        .info-panel h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .info-panel > p {
+            font-size: 15px;
+            color: var(--muted);
+            line-height: 1.7;
+            margin-bottom: 36px;
+        }
+
+        .checklist {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 40px;
+        }
+
+        .checklist li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 14px;
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .checklist-icon {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--red-light);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1px;
+        }
+
+        .checklist-icon svg {
+            width: 12px;
+            height: 12px;
+            stroke: var(--red);
+            stroke-width: 2.5;
+            fill: none;
+        }
+
+        .blood-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .blood-tag {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+
+        .blood-tag.rare {
+            border-color: var(--red-light);
+            background: var(--accent);
+            color: var(--red);
+        }
+
+        /* ── FORM CARD ── */
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 36px;
+            position: sticky;
+            top: 88px;
+        }
+
+        .form-card-header {
+            margin-bottom: 28px;
+        }
+
+        .form-card-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .form-card-header p {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .form-divider {
+            height: 1px;
+            background: var(--border);
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 7px;
+        }
+
+        input[type="text"],
+        input[type="tel"],
+        select {
+            width: 100%;
+            padding: 11px 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            color: var(--text);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            outline: none;
+            transition: border 0.2s, box-shadow 0.2s;
+            appearance: none;
+        }
+
+        input[type="text"]:focus,
+        input[type="tel"]:focus,
+        select:focus {
+            border-color: var(--red);
+            box-shadow: 0 0 0 3px rgba(192,57,43,0.1);
+            background: white;
+        }
+
+        input::placeholder {
+            color: #BBBBBB;
+        }
+
+        .select-wrap {
+            position: relative;
+        }
+
+        .select-wrap::after {
+            content: '';
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid var(--muted);
+            pointer-events: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--red);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: 0.2px;
+        }
+
+        .submit-btn:hover {
+            background: var(--red-dark);
+        }
+
+        .submit-btn:active {
+            transform: scale(0.99);
+        }
+
+        .submit-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: none;
+            stroke: white;
+            stroke-width: 2.5;
+        }
+
+        .form-note {
+            text-align: center;
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 14px;
+            line-height: 1.5;
+        }
+
+        /* ── FEEDBACK SECTION ── */
+        .feedback-section {
+            background: var(--accent);
+            padding: 64px 40px;
+            margin-top: 20px;
+        }
+
+        .feedback-wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .feedback-wrap h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        .feedback-wrap > p {
+            text-align: center;
+            font-size: 14px;
+            color: var(--muted);
+            margin-bottom: 40px;
+        }
+
+        .feedback-grid {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        .feedback-form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 28px;
+        }
+
+        .feedback-form-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+
+        .feedback-form-card textarea {
+            width: 100%;
+            padding: 11px 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            color: var(--text);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            outline: none;
+            resize: vertical;
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+
+        .feedback-form-card textarea:focus {
+            border-color: var(--red);
+            box-shadow: 0 0 0 3px rgba(192,57,43,0.1);
+            background: white;
+        }
+
+        .feedback-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            align-content: start;
+        }
+
+        .feedback-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        .feedback-card-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .feedback-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--red-light);
+            color: var(--red);
+            font-weight: 700;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .feedback-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .feedback-stars {
+            font-size: 12px;
+            color: var(--star);
+            letter-spacing: 1px;
+        }
+
+        .feedback-message {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .feedback-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 32px 20px;
+            color: var(--muted);
+            font-size: 14px;
+            background: var(--surface);
+            border: 1px dashed var(--border);
+            border-radius: 14px;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: #1A0A0A;
+            color: rgba(255,255,255,0.45);
+            text-align: center;
+            padding: 28px 20px;
+            font-size: 13px;
+            margin-top: 0;
+        }
+
+        footer strong {
+            color: rgba(255,255,255,0.75);
+            font-weight: 500;
+        }
+
+        @media (max-width: 860px) {
+            .page-body {
+                grid-template-columns: 1fr;
+                padding: 0 20px;
+                margin: 40px auto;
+                gap: 40px;
+            }
+            .hero {
+                padding: 60px 20px;
+            }
+            .hero-stats {
+                gap: 24px;
+            }
+            header {
+                padding: 0 20px;
+            }
+            .feedback-section {
+                padding: 48px 20px;
+            }
+            .feedback-grid {
+                grid-template-columns: 1fr;
+            }
+            .feedback-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="{% url 'home' %}" class="logo">
+        <div class="logo-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6 8 4 12 4 15a8 8 0 0016 0c0-3-2-7-8-13z"/>
+            </svg>
+        </div>
+        <span class="logo-text">Life<span>Give</span></span>
+    </a>
+    <nav>
+        <a href="{% url 'home' %}" class="active">Donate</a>
+        <a href="{% url 'request' %}">Request Blood</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'donor_profile' %}">My Profile</a>
+            <form method="POST" action="{% url 'logout' %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="nav-btn">Logout</button>
+            </form>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a>
+        {% endif %}
+    </nav>
+</header>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="msg {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="hero">
+    <div class="hero-tag">🩸 Blood Donation Network</div>
+    <h1>Every Drop<br><em>Saves a Life</em></h1>
+    <p>Join thousands of donors across Tamil Nadu giving the gift of life. Register today and be someone's reason to survive.</p>
+    <div class="hero-stats">
+        <div class="stat">
+            <div class="stat-num">4.8K+</div>
+            <div class="stat-label">Active Donors</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num">1,200</div>
+            <div class="stat-label">Lives Saved</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num">38</div>
+            <div class="stat-label">Partner Hospitals</div>
+        </div>
+    </div>
+</div>
+
+<div class="page-body">
+
+    <div class="info-panel">
+        <h2>Why Donate Blood?</h2>
+        <p>One donation can save up to three lives. Blood cannot be manufactured — it can only come from generous donors like you. Your contribution directly helps patients in your community.</p>
+
+        <ul class="checklist">
+            <li>
+                <span class="checklist-icon">
+                    <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+                </span>
+                <span>Takes only 45–60 minutes of your time</span>
+            </li>
+            <li>
+                <span class="checklist-icon">
+                    <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+                </span>
+                <span>Safe, supervised process — your health is our priority</span>
+            </li>
+            <li>
+                <span class="checklist-icon">
+                    <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+                </span>
+                <span>Donors receive a free health screening &amp; blood test report</span>
+            </li>
+            <li>
+                <span class="checklist-icon">
+                    <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+                </span>
+                <span>You can donate again every 56 days (whole blood)</span>
+            </li>
+        </ul>
+
+        <p style="font-size:13px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); margin-bottom:12px;">We accept all blood groups</p>
+        <div class="blood-grid">
+            <div class="blood-tag">A+</div>
+            <div class="blood-tag">A−</div>
+            <div class="blood-tag">B+</div>
+            <div class="blood-tag">B−</div>
+            <div class="blood-tag">O+</div>
+            <div class="blood-tag rare">O−</div>
+            <div class="blood-tag">AB+</div>
+            <div class="blood-tag rare">AB−</div>
+        </div>
+    </div>
+
+    {% if user.is_authenticated %}
+    <div class="form-card">
+        <div class="form-card-header">
+            <h3>You're already registered</h3>
+            <p>Logged in as <strong>{{ user.username }}</strong></p>
+        </div>
+        <div class="form-divider"></div>
+        <a href="{% url 'donor_profile' %}" class="submit-btn" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">
+            View / Edit My Details
+        </a>
+    </div>
+    {% else %}
+    <div class="form-card">
+        <div class="form-card-header">
+            <h3>Register as Donor</h3>
+            <p>Fill in your details below — takes less than a minute</p>
+        </div>
+        <div class="form-divider"></div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="id_username">Choose a Username</label>
+                {{ signup_form.username }}
+                {% if signup_form.username.errors %}<p style="color:var(--red);font-size:12px;margin-top:4px;">{{ signup_form.username.errors|striptags }}</p>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_password">Choose a Password</label>
+                {{ signup_form.password }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_name">Full Name</label>
+                {{ signup_form.name }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_blood_group">Blood Group</label>
+                <div class="select-wrap">
+                    {{ signup_form.blood_group }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_city">City</label>
+                {{ signup_form.city }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_phone">Phone Number</label>
+                {{ signup_form.phone }}
+            </div>
+
+            <button type="submit" name="register_submit" class="submit-btn">
+                <svg viewBox="0 0 16 16"><path d="M8 2v9M4 7l4 4 4-4"/></svg>
+                Register as Donor
+            </button>
+        </form>
+
+        <p class="form-note">🔒 Your contact details are only shared with verified hospitals and in genuine emergencies.</p>
+        <p class="form-note">Already registered? <a href="{% url 'login' %}" style="color:var(--red);font-weight:500;text-decoration:none;">Log in here</a></p>
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- ── FEEDBACK SECTION ── -->
+<div class="feedback-section">
+    <div class="feedback-wrap">
+        <h2>What Our Donors Say</h2>
+        <p>Share your experience or read what others have to say about LifeGive.</p>
+
+        <div class="feedback-grid">
+
+            <div class="feedback-form-card">
+                <h3>Leave Feedback</h3>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="fb_name">Your Name</label>
+                        {{ feedback_form.name }}
+                    </div>
+                    <div class="form-group">
+                        <label for="fb_rating">Rating</label>
+                        <div class="select-wrap">
+                            {{ feedback_form.rating }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="fb_message">Message</label>
+                        {{ feedback_form.message }}
+                    </div>
+                    <button type="submit" name="feedback_submit" class="submit-btn">Submit Feedback</button>
+                </form>
+            </div>
+
+            <div class="feedback-list">
+                {% for fb in feedback_list %}
+                <div class="feedback-card">
+                    <div class="feedback-card-top">
+                        <div class="feedback-avatar">{{ fb.name|slice:":2"|upper }}</div>
+                        <div>
+                            <div class="feedback-name">{{ fb.name }}</div>
+                            <div class="feedback-stars">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= fb.rating %}★{% else %}☆{% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <p class="feedback-message">{{ fb.message }}</p>
+                </div>
+                {% empty %}
+                <div class="feedback-empty">
+                    <p>No feedback yet — be the first to share your experience!</p>
+                </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<footer>
+    <strong>LifeGive</strong> — Blood Donation Network &nbsp;·&nbsp; Making Tamil Nadu healthier, one drop at a time.
+</footer>
+
+</body>
+</html>
